@@ -29,7 +29,19 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options =>
+{
+    options.CustomizeProblemDetails = ctx =>
+    {
+        // In development, include detailed exception information
+        if (builder.Environment.IsDevelopment() && ctx.Exception != null)
+        {
+            ctx.ProblemDetails.Extensions["exception"] = ctx.Exception.GetType().Name;
+            ctx.ProblemDetails.Extensions["exceptionMessage"] = ctx.Exception.Message;
+            ctx.ProblemDetails.Extensions["stackTrace"] = ctx.Exception.StackTrace;
+        }
+    };
+});
 builder.Services.AddCors();
 builder.Services.AddMediatR(cfg =>
 {
@@ -55,8 +67,10 @@ builder.Services.AddOpenApiDocument(options =>
 
 // Register parsing services
 builder.Services.AddHttpClient<GroqClient>();
+builder.Services.AddHttpClient<OpenAiClient>();
 builder.Services.AddSingleton<LookupService>();
 builder.Services.AddScoped<TextParserService>();
+builder.Services.AddScoped<ImageParserService>();
 
 var app = builder.Build();
 

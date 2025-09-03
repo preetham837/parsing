@@ -65,6 +65,76 @@
         }
       }
     },
+    "/api/Parse/id": {
+      "post": {
+        "tags": [
+          "Parse"
+        ],
+        "summary": "Parse ID document information",
+        "description": "Parse driver's license information from image, URL, or text fallback, or lookup stored ID data by ID.\r\n\r\n**How it works:**\r\n1. If you provide an `id` → returns stored ID data\r\n2. If you provide an image file → AI extracts driver's license information using GROQ vision (meta-llama/llama-4-scout-17b-16e-instruct)\r\n3. If you provide `image_url` → Downloads and processes the image \r\n4. If you provide `input_text` → Falls back to text parsing\r\n\r\n**Example usage:** Upload a driver's license image to extract structured information including name, address, document numbers, dates, and physical characteristics.",
+        "operationId": "ParseId",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "inputText": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "imageUrl": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParseIdResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Todos": {
       "get": {
         "tags": [
@@ -292,6 +362,141 @@
             "type": "string",
             "description": "ID to lookup stored person data",
             "nullable": true
+          }
+        }
+      },
+      "ParseIdResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source": {
+            "type": "string",
+            "description": "Source of the data"
+          },
+          "data": {
+            "description": "Extracted ID document information",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IdParsed"
+              }
+            ]
+          }
+        }
+      },
+      "IdParsed": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "fullName": {
+            "type": "string",
+            "description": "Full name as it appears on the ID"
+          },
+          "dateOfBirth": {
+            "type": "string",
+            "description": "Date of birth in yyyy-mm-dd format"
+          },
+          "address": {
+            "description": "Address information from the ID",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/IdAddress"
+              }
+            ]
+          },
+          "documentNumber": {
+            "type": "string",
+            "description": "Driver's license or ID document number"
+          },
+          "expirationDate": {
+            "type": "string",
+            "description": "Expiration date in yyyy-mm-dd format"
+          },
+          "issueDate": {
+            "type": "string",
+            "description": "Issue date in yyyy-mm-dd format"
+          },
+          "licenseClass": {
+            "type": "string",
+            "description": "License class"
+          },
+          "endorsements": {
+            "type": "string",
+            "description": "License endorsements"
+          },
+          "restrictions": {
+            "type": "string",
+            "description": "License restrictions"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Sex/Gender"
+          },
+          "eyeColor": {
+            "type": "string",
+            "description": "Eye color"
+          },
+          "height": {
+            "type": "string",
+            "description": "Height"
+          },
+          "detectedCountry": {
+            "type": "string",
+            "description": "Detected country from ID analysis"
+          },
+          "detectedState": {
+            "type": "string",
+            "description": "Detected state from ID analysis"
+          },
+          "barcodePresent": {
+            "type": "boolean",
+            "description": "Whether a barcode was detected on the ID"
+          },
+          "warnings": {
+            "type": "array",
+            "description": "Warning messages about data quality",
+            "items": {
+              "type": "string"
+            }
+          },
+          "confidences": {
+            "type": "object",
+            "description": "Confidence scores for extracted fields",
+            "additionalProperties": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "boxes": {
+            "type": "object",
+            "description": "Bounding boxes for detected fields",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "number",
+                "format": "float"
+              }
+            }
+          }
+        }
+      },
+      "IdAddress": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "street": {
+            "type": "string"
+          },
+          "city": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "zipCode": {
+            "type": "string"
           }
         }
       },

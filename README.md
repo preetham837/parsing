@@ -136,9 +136,11 @@ curl -X POST http://localhost:5000/api/parse/id \
 
 ### Environment Variables
 
-- `GROQ_API_KEY`: Your GROQ API key (required)
+- `GROQ_API_KEY`: Your GROQ API key (required for text parsing)
+- `OPENAI_API_KEY`: Your OpenAI API key (required for image parsing)
 - `TextParserModel`: GROQ model for text parsing (default: `llama-3.3-70b-versatile`)
 - `ImageParserModel`: GROQ model for image parsing (default: `llama-3.2-90b-vision-preview`)
+- `OpenAiVisionModel`: OpenAI model for image parsing (default: `gpt-4o`)
 
 ### Supported Image Formats
 

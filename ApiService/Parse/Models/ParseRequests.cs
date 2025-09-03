@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Http;
 
 namespace ApiService.Parse.Models;
 
@@ -42,4 +43,10 @@ public class ParseIdRequest
     /// <example>https://example.com/drivers-license.jpg</example>
     [Description("URL to driver's license image")]
     public string? ImageUrl { get; set; }
+    
+    /// <summary>
+    /// Driver's license image file upload (JPG, PNG, WebP)
+    /// </summary>
+    [Description("Driver's license image file upload")]
+    public IFormFile? Image { get; set; }
 }
