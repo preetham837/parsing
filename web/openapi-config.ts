@@ -5,11 +5,11 @@ const config: ConfigFile = {
   apiFile: './src/store/api/empty-api.ts',
   apiImport: 'emptySplitApi',
   outputFiles: {
-    './src/store/api/generated/todos.ts': {
-      filterEndpoints: [/Todo/]
+    './src/store/api/generated/parsing.ts': {
+      filterEndpoints: [/^Parse$/]
     },
   },
-  exportName: 'todosApi',
+  exportName: 'api',
   hooks: true,
 }
 

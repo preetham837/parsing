@@ -1,8 +1,25 @@
 using System.Reflection;
-using ApiService.Python;
+using ApiService.Parse.Services;
 using Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load .env file
+var envFilePath = Path.Combine(Directory.GetCurrentDirectory(), "..", ".env");
+if (File.Exists(envFilePath))
+{
+    foreach (var line in File.ReadAllLines(envFilePath))
+    {
+        if (!string.IsNullOrWhiteSpace(line) && line.Contains('='))
+        {
+            var parts = line.Split('=', 2);
+            if (parts.Length == 2)
+            {
+                Environment.SetEnvironmentVariable(parts[0].Trim(), parts[1].Trim());
+            }
+        }
+    }
+}
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
@@ -26,7 +43,7 @@ builder.AddSqlServerDbContext<TodoDbContext>("tododb");
 builder.Services.AddOpenApiDocument(options =>
 {
     options.DocumentName = "v1";
-    options.Title = "Todos API";
+    options.Title = "Personal Information Parser API";
     options.Version = "v1";
     options.UseHttpAttributeNameAsOperationId = true;
 
@@ -36,8 +53,10 @@ builder.Services.AddOpenApiDocument(options =>
     };
 });
 
-builder.Services.AddHttpClient<PythonClient>(
-    static client => client.BaseAddress = new("http://pythonapi"));
+// Register parsing services
+builder.Services.AddHttpClient<GroqClient>();
+builder.Services.AddSingleton<LookupService>();
+builder.Services.AddScoped<TextParserService>();
 
 var app = builder.Build();
 
