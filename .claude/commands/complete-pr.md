@@ -1,0 +1,1 @@
+Squash merge any pending PR, checkout the main branch, pull any latest changes, and delete the corresponding feature branch
